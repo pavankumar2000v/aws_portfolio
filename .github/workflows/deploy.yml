@@ -1,0 +1,27 @@
+name: Deploy Portfolio
+on:
+  push:
+    branches: [ main ]  # Trigger only when you push to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to AWS via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd ~/aws_portfolio
+            git pull origin main
+            # Build the new image locally on the server
+            docker build -t localhost/aws_portfolio:latest .
+            # Replace the old container with the new one
+            docker run -d --replace -p 8080:8000 --name my-portfolio-app localhost/aws_portfolio:latest
+            # Cleanup old unused images to save space
+            docker image prune -f
