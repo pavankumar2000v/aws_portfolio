@@ -11,7 +11,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Deploy to AWS via SSH
-        uses: ubuntu@18.60.101.73
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
